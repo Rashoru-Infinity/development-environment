@@ -1,0 +1,11 @@
+- hosts: dev
+  remote_user: rashoru-infinity
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Include Docker ecosystem role
+      ansible.builtin.include_role:
+        name: docker-ecosystem
+    - name: Include NVIDIA ecosystem role
+      ansible.builtin.include_role:
+        name: nvidia-ecosystem
