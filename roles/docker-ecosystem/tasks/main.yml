@@ -1,0 +1,26 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/docker-ecosystem
+- name: Validate platform
+  ansible.builtin.assert:
+    that:
+      - ansible_facts["distribution"] == "Ubuntu"
+      - ansible_facts["architecture"] == "x86_64"
+    fail_msg: >-
+      Docker ecosystem role currently supports only Ubuntu x86_64.
+- name: Setup Docker repository
+  include_tasks: repository.yml
+- name: Install packages required for Docker installation
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+- name: Restart Docker service
+  ansible.builtin.systemd:
+    name: docker
+    state: restarted
+    enabled: true
