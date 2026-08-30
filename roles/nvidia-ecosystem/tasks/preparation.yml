@@ -1,0 +1,22 @@
+- name: Disable nouveau driver
+  include_tasks: disable_nouveau.yml
+- name: Clean NVIDIA driver packages
+  ansible.builtin.apt:
+    name: nvidia-*
+    state: absent
+    purge: true
+    autoremove: true
+- name: Clean CUDA packages
+  ansible.builtin.apt:
+    name: cuda-*
+    state: absent
+    purge: true
+    autoremove: true
+- name: Get current kernel version
+  ansible.builtin.shell: uname -r
+  register: kernel_version
+  changed_when: false
+- name: Install linux kernel headers
+  ansible.builtin.apt:
+    name: linux-headers-{{ kernel_version.stdout }}
+    state: present

@@ -1,0 +1,42 @@
+- name: Download NVIDIA CUDA repository keyring package
+  ansible.builtin.get_url:
+    url: https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2604/{{ nvidia_cuda_architecture }}/cuda-keyring_{{ nvidia_cuda_keyring_version }}_all.deb
+    dest: /var/cache/apt/archives/cuda-keyring_{{ nvidia_cuda_keyring_version }}_all.deb
+    owner: root
+    group: root
+    mode: '0644'
+    checksum: "sha256:{{ nvidia_cuda_keyring_sha256 }}"
+- name: Enable NVIDIA CUDA repository
+  ansible.builtin.apt:
+    deb: /var/cache/apt/archives/cuda-keyring_{{ nvidia_cuda_keyring_version }}_all.deb
+    state: present
+- name: Create APT keyring directory for the NVIDIA container toolkit repository
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+- name: Download and verify NVIDIA Container Toolkit repository key
+  ansible.builtin.get_url:
+    url: https://nvidia.github.io/libnvidia-container/gpgkey
+    dest: /etc/apt/keyrings/nvidia-container-toolkit.asc
+    owner: root
+    group: root
+    mode: '0644'
+- name: Enable NVIDIA Container Toolkit repository
+  ansible.builtin.deb822_repository:
+    name: nvidia-container-toolkit
+    types:
+      - deb
+    uris:
+      - >-
+        https://nvidia.github.io/libnvidia-container/stable/deb/{{ nvidia_container_repository_architecture }}
+    suites:
+      - /
+    signed_by: /etc/apt/keyrings/nvidia-container-toolkit.asc
+    state: present
+  register: nvidia_container_repository
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true

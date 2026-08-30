@@ -1,0 +1,11 @@
+- name: Check whether the nouveau driver is loaded
+  ansible.builtin.shell: lsmod | grep nouveau
+  register: nouveau_loaded
+  ignore_errors: true
+- name: Create a file to disable the nouveau driver
+  community.general.kernel_blacklist:
+    name: nouveau
+    state: absent
+- name: Regenerate the kernel initramfs
+  ansible.builtin.shell: update-initramfs -u
+  when: nouveau_loaded.rc == 0

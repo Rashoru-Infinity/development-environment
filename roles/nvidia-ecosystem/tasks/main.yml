@@ -1,0 +1,44 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/nvidia-ecosystem
+- name: Validate platform
+  ansible.builtin.assert:
+    that:
+      - ansible_facts["distribution"] == "Ubuntu"
+      - ansible_facts["architecture"] == "x86_64"
+    fail_msg: >-
+      NVIDIA ecosystem role currently supports only Ubuntu x86_64.
+- name: Prepare system for NVIDIA driver installation
+  include_tasks: preparation.yml
+- name: Setup NVIDIA CUDA repository
+  include_tasks: repository.yml
+- name: Pin NVIDIA driver packages
+  ansible.builtin.apt:
+    name: nvidia-driver-pinning-{{ version }}
+    state: present
+- name: Install NVIDIA driver
+  ansible.builtin.apt:
+    name: nvidia-open
+    state: present
+- name: Install NVIDIA CUDA toolkit
+  ansible.builtin.apt:
+    name: cuda-toolkit-{{ nvidia_cuda_toolkit_version }}
+    state: present
+- name: Install NVIDIA Container Toolkit
+  ansible.builtin.apt:
+    name:
+      - nvidia-container-toolkit={{ nvidia_container_toolkit_version }}
+      - nvidia-container-toolkit-base={{ nvidia_container_toolkit_version }}
+      - libnvidia-container-tools={{ nvidia_container_toolkit_version }}
+      - libnvidia-container1={{ nvidia_container_toolkit_version }}
+    state: present
+- name: Reboot the system to apply changes
+  ansible.builtin.reboot:
+    post_reboot_delay: 60
+- name: Verify NVIDIA driver and GPU
+  ansible.builtin.shell: nvidia-smi
+  register: nvidia_smi_output
+  changed_when: false
+- name: Display NVIDIA driver and GPU information
+  ansible.builtin.debug:
+    msg: "{{ nvidia_smi_output.stdout }}"

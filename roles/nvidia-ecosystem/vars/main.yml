@@ -1,0 +1,10 @@
+#SPDX-License-Identifier: MIT-0
+---
+# vars file for roles/nvidia-ecosystem
+version: '610'
+nvidia_cuda_keyring_version: "1.1-1"
+nvidia_cuda_architecture: "x86_64"
+nvidia_cuda_keyring_sha256: "f7f474b5f6a4adf987aa587920df00e713285958ef6a913dda1945a544a3099e"
+nvidia_cuda_toolkit_version: "13-3"
+nvidia_container_repository_architecture: "amd64"
+nvidia_container_toolkit_version: "1.20.0-1"
