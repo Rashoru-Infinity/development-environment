@@ -12,3 +12,6 @@
     - name: Include Golang role
       ansible.builtin.include_role:
         name: golang
+    - name: Include Bazelisk role
+      ansible.builtin.include_role:
+        name: bazelisk

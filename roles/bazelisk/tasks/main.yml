@@ -1,0 +1,20 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/bazelisk
+- name: Validate platform
+  ansible.builtin.assert:
+    that:
+      - ansible_facts["architecture"] == "x86_64"
+    fail_msg: >-
+      Bazelisk role currently supports only x86_64.
+- name: Install Bazelisk binary
+  ansible.builtin.get_url:
+    url: "https://github.com/bazelbuild/bazelisk/releases/download/{{ version }}/bazelisk-{{ platform }}"
+    dest: /usr/local/bin/bazelisk-{{ version }}
+    mode: '0755'
+    checksum: "{{ checksum }}"
+- name: Create symlink for Bazelisk
+  ansible.builtin.file:
+    src: /usr/local/bin/bazelisk-{{ version }}
+    dest: /usr/local/bin/bazel
+    state: link
