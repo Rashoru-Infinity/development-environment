@@ -1,0 +1,24 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/c-cpp-toolchain
+- name: Validate platform
+  ansible.builtin.assert:
+    that:
+      - ansible_facts["distribution"] == "Ubuntu"
+    fail_msg: >-
+      C/C++ toolchain role currently supports only Ubuntu.
+- name: Get kernel version
+  ansible.builtin.shell: uname -r
+  register: kernel_version
+  changed_when: false
+- name: Install C/C++ build-essential packages
+  ansible.builtin.apt:
+    name:
+      - build-essential
+      - g++
+      - cmake
+      - gdb
+      - valgrind
+      - linux-headers-{{ kernel_version.stdout }}
+    state: present
+    update_cache: true
