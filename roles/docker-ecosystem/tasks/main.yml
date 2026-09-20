@@ -5,9 +5,8 @@
   ansible.builtin.assert:
     that:
       - ansible_facts["distribution"] == "Ubuntu"
-      - ansible_facts["architecture"] == "x86_64"
     fail_msg: >-
-      Docker ecosystem role currently supports only Ubuntu x86_64.
+      Docker ecosystem role currently supports only Ubuntu.
 - name: Setup Docker repository
   include_tasks: repository.yml
 - name: Install packages required for Docker installation
