@@ -1,0 +1,26 @@
+- block:
+  - name: Make temp directory for rustup-init
+    ansible.builtin.tempfile:
+      state: directory
+      suffix: rustup-init
+    register: rustup_init_tempdir
+  - name: Get rustup-init
+    ansible.builtin.get_url:
+      url: "https://static.rust-lang.org/rustup/archive/{{ version }}/{{ platform }}/rustup-init"
+      dest: "{{ rustup_init_tempdir.path }}/rustup-init"
+      mode: '0755'
+      checksum: "{{ checksum }}"
+  - name: Install Rust toolchain
+    ansible.builtin.shell: "{{ rustup_init_tempdir.path }}/rustup-init -y --no-modify-path"
+  - name: Add Cargo environment to profile
+    ansible.builtin.lineinfile:
+      path: "{{ user_home }}/.profile"
+      line: '. "$HOME/.cargo/env"'
+      create: true
+      state: present
+  always:
+    - name: Remove temp directory for rustup-init
+      ansible.builtin.file:
+        path: "{{ rustup_init_tempdir.path }}"
+        state: absent
+  become: false

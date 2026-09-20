@@ -1,0 +1,5 @@
+- name: Install rust toolchain
+  become: false
+  ansible.builtin.shell: rustup toolchain install {{ version }} 
+  environment:
+    PATH: "{{ ansible_facts['env']['PATH'] }}:{{ user_home }}/.cargo/bin"

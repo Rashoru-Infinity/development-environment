@@ -1,0 +1,32 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/rust-toolchain
+- name: Validate platform
+  ansible.builtin.assert:
+    that:
+      - ansible_facts["distribution"] == "Ubuntu"
+      - ansible_facts["architecture"] == "x86_64"
+    fail_msg: >-
+      Rust toolchain role currently supports only Ubuntu x86_64.
+- name: Get user home directory
+  ansible.builtin.shell: 'printf "%s" "$HOME"'
+  register: user_home
+  changed_when: false
+  become: false
+- name: Set user home directory fact
+  ansible.builtin.set_fact:
+    user_home: "{{ user_home.stdout }}"
+- name: Get installed Rust version
+  ansible.builtin.shell: rustup --version | awk '{print $2}'
+  register: rust_version
+  changed_when: false
+  ignore_errors: true
+  become: false
+  environment:
+    PATH: "{{ ansible_facts['env']['PATH'] }}:{{ user_home }}/.cargo/bin"
+- name: Initial installation of Rust toolchain
+  ansible.builtin.include_tasks: initial-install.yml
+  when: rust_version.rc != 0
+- name: Install Rust toolchain
+  ansible.builtin.include_tasks: install.yml
+  when: rust_version.rc == 0 and rust_version.stdout != version
