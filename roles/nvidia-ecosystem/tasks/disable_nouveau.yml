@@ -6,6 +6,8 @@
   community.general.kernel_blacklist:
     name: nouveau
     state: absent
+  register: nouveau_blacklist
 - name: Regenerate the kernel initramfs
   ansible.builtin.shell: update-initramfs -u
-  when: nouveau_loaded.rc == 0
+  when: nouveau_loaded.rc == 0 and nouveau_blacklist.changed
+  register: initramfs_updated

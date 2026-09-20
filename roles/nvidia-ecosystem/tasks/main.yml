@@ -20,6 +20,7 @@
   ansible.builtin.apt:
     name: nvidia-open
     state: present
+  register: nvidia_driver_install
 - name: Install NVIDIA CUDA toolkit
   ansible.builtin.apt:
     name: cuda-toolkit-{{ nvidia_cuda_toolkit_version }}
@@ -35,6 +36,7 @@
 - name: Reboot the system to apply changes
   ansible.builtin.reboot:
     post_reboot_delay: 60
+  when: nvidia_driver_install.changed or initramfs_updated.changed
 - name: Verify NVIDIA driver and GPU
   ansible.builtin.shell: nvidia-smi
   register: nvidia_smi_output

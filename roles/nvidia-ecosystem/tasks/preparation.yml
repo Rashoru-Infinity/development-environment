@@ -1,17 +1,24 @@
 - name: Disable nouveau driver
   include_tasks: disable_nouveau.yml
+- name: Get installed NVIDIA driver version
+  ansible.builtin.shell: nvidia-smi --query-gpu=driver_version --format=noheader | awk -F. '{print $1}'
+  register: nvidia_driver_version
+  changed_when: false
+  ignore_errors: true
 - name: Clean NVIDIA driver packages
   ansible.builtin.apt:
     name: nvidia-*
     state: absent
     purge: true
     autoremove: true
+  when: nvidia_driver_version.rc != 0 or nvidia_driver_version.stdout != version
 - name: Clean CUDA packages
   ansible.builtin.apt:
     name: cuda-*
     state: absent
     purge: true
     autoremove: true
+  when: nvidia_driver_version.rc != 0 or nvidia_driver_version.stdout != version
 - name: Get current kernel version
   ansible.builtin.shell: uname -r
   register: kernel_version
