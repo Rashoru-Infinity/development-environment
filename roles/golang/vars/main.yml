@@ -1,0 +1,6 @@
+#SPDX-License-Identifier: MIT-0
+---
+# vars file for roles/golang
+version: "1.27.1"
+platform: "linux-amd64"
+checksum: "63d339f0da5ab53635a56f2490a7984dfe12dfcff22ad749f63edaf590168445"

@@ -9,3 +9,6 @@
     - name: Include NVIDIA ecosystem role
       ansible.builtin.include_role:
         name: nvidia-ecosystem
+    - name: Include Golang role
+      ansible.builtin.include_role:
+        name: golang

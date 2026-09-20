@@ -1,0 +1,20 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for roles/golang
+- name: Validate platform
+  ansible.builtin.assert:
+    that:
+      - ansible_facts["architecture"] == "x86_64"
+    fail_msg: >-
+      Golang role currently supports only x86_64.
+- name: Get installed Golang version
+  ansible.builtin.shell: go version | awk '{print $3}' | sed 's/go//'
+  environment:
+    PATH: /usr/local/go/bin:{{ ansible_facts["env"]["PATH"] }}
+  register: golang_version
+  changed_when: false
+  failed_when: false
+  ignore_errors: true
+- name: Install Golang
+  ansible.builtin.include_tasks: install.yml
+  when: golang_version.rc != 0 or golang_version.stdout != version

@@ -1,0 +1,29 @@
+- name: Uninstall existing Golang version
+  ansible.builtin.file:
+    path: /usr/local/go
+    state: absent
+- name: Download Golang tarball
+  ansible.builtin.get_url:
+    url: "https://go.dev/dl/go{{ version }}.{{ platform }}.tar.gz"
+    dest: /tmp/go{{ version }}.{{ platform }}.tar.gz
+    owner: root
+    group: root
+    mode: '0644'
+    checksum: "sha256:{{ checksum }}"
+- name: Extract Golang tarball
+  ansible.builtin.unarchive:
+    src: /tmp/go{{ version }}.{{ platform }}.tar.gz
+    dest: /usr/local
+    remote_src: true
+- name: Set Golang environment variables
+  ansible.builtin.copy:
+    dest: /etc/profile.d/golang.sh
+    content: |
+      export PATH=/usr/local/go/bin:$PATH
+    owner: root
+    group: root
+    mode: '0644'
+- name: Clean up Golang tarball
+  ansible.builtin.file:
+    path: /tmp/go{{ version }}.{{ platform }}.tar.gz
+    state: absent
